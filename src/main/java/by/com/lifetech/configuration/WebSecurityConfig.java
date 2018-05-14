@@ -32,7 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(new JwtFilter(authenticationManager()), AbstractPreAuthenticatedProcessingFilter.class)
                 .addFilterBefore(new BasicAuthenticationFilter(authenticationManager()), BasicAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/user/login").anonymous()
+                .antMatchers("/auth/login").anonymous()
                 .anyRequest().authenticated()
                 .and()
                 .logout().permitAll();

@@ -1,0 +1,38 @@
+package by.com.lifetech.controller;
+
+import by.com.lifetech.dto.ResponseDTO;
+import by.com.lifetech.dto.security.JwtAuthenticationToken;
+import by.com.lifetech.dto.security.UserDto;
+import by.com.lifetech.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping(value = "/auth")
+public class AuthController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthController.class);
+    private UserService userService;
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    public AuthController(UserService userService, ObjectMapper objectMapper) {
+        this.userService = userService;
+        this.objectMapper = objectMapper;
+    }
+
+    @PostMapping(value = "/login")
+    public ResponseDTO login(@RequestBody UserDto userDto) throws JsonProcessingException {
+        LOGGER.debug("AuthController.login() method was called. userDTO: {}", objectMapper.writeValueAsString(userDto));
+
+        JwtAuthenticationToken token = userService.getToken(userDto);
+
+        return new ResponseDTO(token);
+    }
+}
