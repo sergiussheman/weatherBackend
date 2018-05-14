@@ -16,6 +16,7 @@ public class UserFromDTOConverter implements Converter<UserDtoExtended, User> {
         result.setUsername(userDto.getUsername());
         result.setPassword(userDto.getPassword());
         result.setRole(userDto.getRole());
+        result.setRoot(userDto.isRoot());
         result.setEmail(userDto.getEmail());
         return result;
     }

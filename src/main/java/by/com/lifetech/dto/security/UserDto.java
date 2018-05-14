@@ -12,5 +12,6 @@ public class UserDto {
     private String password;
     private String token;
     private String role;
+    private boolean isRoot;
     private String email;
 }

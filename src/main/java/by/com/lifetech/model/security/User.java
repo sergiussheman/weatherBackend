@@ -22,6 +22,9 @@ public class User extends BaseEntity {
     @Column(name = "ROLE", nullable = false)
     private String role;
 
+    @Column(name = "IS_ROOT", columnDefinition = "TINYINT(1)")
+    private boolean isRoot;
+
     @Column(name = "EMAIL")
     private String email;
 
