@@ -10,8 +10,11 @@ import java.util.Date;
 @Entity
 @Table(name = "LOCATION")
 public class Location extends BaseEntity {
-    @Column(name = "VALUE", nullable = false, unique = true)
-    private String value;
+    @Column(name = "COUNTRY", nullable = false)
+    private String country;
+
+    @Column(name = "CITY", nullable = false)
+    private String city;
 
     @Column(name = "DESCRIPTION")
     private String description;

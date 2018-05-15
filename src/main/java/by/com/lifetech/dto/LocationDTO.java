@@ -10,7 +10,8 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LocationDTO {
-    private String value;
+    private String country;
+    private String city;
     private String description;
     private Long userId;
     private Date addTime;

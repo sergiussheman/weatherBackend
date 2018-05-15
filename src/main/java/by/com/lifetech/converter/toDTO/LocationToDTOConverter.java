@@ -11,7 +11,8 @@ public class LocationToDTOConverter implements Converter<Location, LocationDTOEx
     public LocationDTOExtended convert(Location location) {
         LocationDTOExtended result = new LocationDTOExtended();
         result.setId(location.getId());
-        result.setValue(location.getValue());
+        result.setCountry(location.getCountry());
+        result.setCity(location.getCity());
         result.setDescription(location.getDescription());
         if(location.getUser() != null) {
             result.setUserId(location.getUser().getId());

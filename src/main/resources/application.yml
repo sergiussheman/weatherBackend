@@ -10,8 +10,9 @@ spring:
     hibernate:
       ddl-auto: none
 
-JWT_KEY:
-  mysecretkey
+JWT_KEY: mysecretkey
+WEATHER_BASE_URL: http://api.wunderground.com/
+API_KEY: 58ce7736d7957a83
 
 server:
   port: 8000
