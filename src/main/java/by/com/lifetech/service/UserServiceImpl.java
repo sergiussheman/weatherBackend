@@ -3,6 +3,7 @@ package by.com.lifetech.service;
 import by.com.lifetech.dto.security.JwtAuthenticationToken;
 import by.com.lifetech.dto.security.UserDto;
 import by.com.lifetech.exception.InvalidAuthenticationException;
+import by.com.lifetech.exception.WeatherException;
 import by.com.lifetech.model.security.User;
 import by.com.lifetech.repository.UserRepository;
 import io.jsonwebtoken.Jwts;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -51,6 +53,14 @@ public class UserServiceImpl extends BaseCrudServiceImpl<User, Long, UserReposit
                 .setExpiration(expirationDate.getTime())
                 .signWith(SignatureAlgorithm.HS256, key).compact();
         return new JwtAuthenticationToken(roles, userFromDatabase.getUsername(), token);
+    }
+
+    @Override
+    public User findByName(String userName) {
+        if(StringUtils.isEmpty(userName)) {
+            throw new WeatherException("Such User doesn't exist");
+        }
+        return this.repository.findByUsername(userName);
     }
 
 }

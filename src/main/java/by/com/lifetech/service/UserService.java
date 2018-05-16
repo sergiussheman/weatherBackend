@@ -9,4 +9,5 @@ import by.com.lifetech.repository.UserRepository;
 public interface UserService extends BaseCrudService<User, Long, UserRepository> {
     JwtAuthenticationToken getToken(UserDto user) throws InvalidAuthenticationException;
 
+    User findByName(String userName);
 }

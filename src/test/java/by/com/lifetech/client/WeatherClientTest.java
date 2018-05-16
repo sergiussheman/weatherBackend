@@ -9,10 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import retrofit2.Call;
-import retrofit2.Response;
-
-import java.io.IOException;
 
 @WebAppConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -23,20 +19,10 @@ public class WeatherClientTest {
     private WeatherService weatherService;
 
     @Test
-    public void getWeather_OK() {
-        String countryCode = "BY";
-        String cityCode = "Minsk";
+    public void getWeather_OK() throws Exception {
 
-        Call<ConditionDTO> result = this.weatherService.getWeatherConditions(countryCode, cityCode);
-        Response<ConditionDTO> conditions;
-        try {
-            conditions = result.execute();
-            ConditionDTO body = conditions.body();
-            Assert.notNull(body);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        ConditionDTO result = this.weatherService.getWeatherConditions(1L);
+        Assert.notNull(result);
     }
 
 
