@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -42,7 +43,9 @@ public class QueryLogServiceImpl extends BaseCrudServiceImpl<QueryLog, Long, Que
             throw new WeatherException("Such user doesn't exist");
         }
 
-        return repository.findByUser(user);
+        List<QueryLog> result = repository.findByUser(user);
+        result.sort(Comparator.comparing(QueryLog::getQueryTime).reversed());
+        return result;
     }
 
 

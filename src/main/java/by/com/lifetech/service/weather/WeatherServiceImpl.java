@@ -2,12 +2,17 @@ package by.com.lifetech.service.weather;
 
 import by.com.lifetech.client.WeatherClient;
 import by.com.lifetech.dto.weather.ConditionDTO;
+import by.com.lifetech.dto.weather.QueryStatus;
 import by.com.lifetech.model.Location;
 import by.com.lifetech.service.LocationService;
+import by.com.lifetech.service.log.QueryLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -28,10 +33,12 @@ public class WeatherServiceImpl implements WeatherService {
     private String apiKey;
     private WeatherClient weatherClient;
     private LocationService locationService;
+    private QueryLogService queryLogService;
 
     @Autowired
-    public WeatherServiceImpl(LocationService locationService) {
+    public WeatherServiceImpl(LocationService locationService, QueryLogService queryLogService) {
         this.locationService = locationService;
+        this.queryLogService = queryLogService;
     }
 
     @PostConstruct
@@ -47,6 +54,7 @@ public class WeatherServiceImpl implements WeatherService {
 
     @Override
     public ConditionDTO getWeatherConditions(Long locationId) throws Exception {
+        long startTime = System.currentTimeMillis();
         if(locationId == null) {
             throw new Exception("You have to pass the correct locationIf");
         }
@@ -66,16 +74,24 @@ public class WeatherServiceImpl implements WeatherService {
             body = conditions.body();
         } catch (IOException e) {
             LOGGER.error("Error while getting weather condition.", e);
-            this.logResponse();
+            this.logResponse(location, null, System.currentTimeMillis() - startTime, QueryStatus.ERROR);
             throw new Exception("Weather service unavailable. Try again later...");
         }
 
-        this.logResponse();
+        this.logResponse(location, body, System.currentTimeMillis() - startTime, QueryStatus.SUCCESSFUL);
         return body;
     }
 
-    private void logResponse() {
-        //TODO implement this method
+    private void logResponse(Location location, Object response, Long duration, QueryStatus queryStatus) {
+        this.queryLogService.logWeatherQuery(getCurrentUser(), location, response, duration, queryStatus);
+    }
+
+    private String getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            return authentication.getName();
+        }
+        return null;
     }
 
 }
