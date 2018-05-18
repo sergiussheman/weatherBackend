@@ -6,7 +6,7 @@ import by.com.lifetech.model.security.User;
 import by.com.lifetech.repository.LocationRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -37,7 +37,7 @@ public class LocationServiceImpl extends BaseCrudServiceImpl<Location, Long, Loc
     }
 
     @Override
-    @CachePut("locations")
+    @CacheEvict(value = "locations", allEntries = true)
     public Location saveOrUpdate(Location location) {
         String username = getCurrentUser();
         if(StringUtils.isEmpty(username)) {
