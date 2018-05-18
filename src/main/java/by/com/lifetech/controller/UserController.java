@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,6 +45,7 @@ public class UserController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseDTO saveOrUpdateUser(@RequestBody UserDtoExtended userDto) throws JsonProcessingException {
         LOGGER.debug("UserController.saveOrUpdateUser() method was called. userDTO = {}",
                 objectMapper.writeValueAsString(userDto));
@@ -53,6 +55,7 @@ public class UserController {
     }
 
     @DeleteMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseDTO deleteUser(@RequestParam Long userId) {
         LOGGER.debug("UserController.deleteUser() method was called. Id = {}", userId);
 
