@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,7 +45,6 @@ public class LocationController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseDTO saveOrUpdateLocation(@RequestBody LocationDTOExtended locationDTO) throws JsonProcessingException {
         LOGGER.debug("LocationController.saveOrUpdateLocation() method was called. LocationDTO = {}",
                 objectMapper.writeValueAsString(locationDTO));
@@ -56,7 +54,6 @@ public class LocationController {
     }
 
     @DeleteMapping
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseDTO deleteLocation(@RequestParam Long locationId) {
         LOGGER.debug("LocationController.deleteLocation() method was called. Id = {}", locationId);
 

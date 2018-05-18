@@ -5,8 +5,8 @@ import by.com.lifetech.security.JwtFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -21,7 +21,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${JWT_KEY}")
     private String key;
@@ -31,10 +30,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .csrf().disable()
-                .addFilterBefore(new JwtFilter(authenticationManager()), AbstractPreAuthenticatedProcessingFilter.class)
                 .addFilterBefore(new BasicAuthenticationFilter(authenticationManager()), BasicAuthenticationFilter.class)
+                .addFilterBefore(new JwtFilter(authenticationManager()), AbstractPreAuthenticatedProcessingFilter.class)
                 .authorizeRequests()
                 .antMatchers("/auth/login").anonymous()
+                .antMatchers(HttpMethod.POST,"/user" ).hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/user").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST, "/location").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/location").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .logout().permitAll();
