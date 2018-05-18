@@ -6,8 +6,10 @@ import by.com.lifetech.exception.InvalidAuthenticationException;
 import by.com.lifetech.exception.WeatherException;
 import by.com.lifetech.model.security.User;
 import by.com.lifetech.repository.UserRepository;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import java.util.List;
 @Service
 public class UserServiceImpl extends BaseCrudServiceImpl<User, Long, UserRepository> implements UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final String ROLES = "roles";
     @Value("${JWT_KEY}")
     private String key;
     private UserRepository userRepository;
@@ -61,6 +64,35 @@ public class UserServiceImpl extends BaseCrudServiceImpl<User, Long, UserReposit
             throw new WeatherException("Such User doesn't exist");
         }
         return this.repository.findByUsername(userName);
+    }
+
+    @Override
+    public JwtAuthenticationToken refreshToken(String token) throws WeatherException {
+        final Claims claims;
+        try {
+            claims = Jwts.parser().setSigningKey(key)
+                    .parseClaimsJws(token).getBody();
+        } catch (final SignatureException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new WeatherException("Token was expired");
+        }
+        String userName = claims.get("sub").toString();
+        List<String> roles = claims.get(ROLES, List.class);
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        for (String role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role));
+        }
+
+        Calendar expirationDate = Calendar.getInstance();
+        expirationDate.add(Calendar.MINUTE, 30);
+        String updatedToken = Jwts.builder().setSubject(userName)
+                .claim(ROLES, roles).setIssuedAt(new Date())
+                .setExpiration(expirationDate.getTime())
+                .signWith(SignatureAlgorithm.HS256, key).compact();
+        return new JwtAuthenticationToken(
+                authorities,
+                claims.get("sub", String.class),
+                updatedToken);
     }
 
 }
