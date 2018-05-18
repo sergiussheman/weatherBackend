@@ -6,12 +6,15 @@ import by.com.lifetech.model.security.User;
 import by.com.lifetech.repository.LocationRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.Collection;
 import java.util.Date;
 
 @Service
@@ -27,6 +30,14 @@ public class LocationServiceImpl extends BaseCrudServiceImpl<Location, Long, Loc
     }
 
     @Override
+    @Cacheable("locations")
+    public Collection<Location> getAllLocations() {
+        log.debug("Getting all locations");
+        return findAll();
+    }
+
+    @Override
+    @CachePut("locations")
     public Location saveOrUpdate(Location location) {
         String username = getCurrentUser();
         if(StringUtils.isEmpty(username)) {

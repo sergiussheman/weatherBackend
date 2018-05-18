@@ -13,6 +13,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,16 +29,20 @@ public class QueryLogServiceImpl extends BaseCrudServiceImpl<QueryLog, Long, Que
     private UserService userService;
     private HttpServletRequest httpServletRequest;
     private ObjectMapper objectMapper;
+    private CacheManager cacheManager;
 
 
     @Autowired
-    public QueryLogServiceImpl(QueryLogRepository queryLogRepository, UserService userService, ObjectMapper objectMapper) {
+    public QueryLogServiceImpl(QueryLogRepository queryLogRepository, UserService userService, ObjectMapper objectMapper,
+                               CacheManager cacheManager) {
         super(queryLogRepository);
         this.userService = userService;
         this.objectMapper = objectMapper;
+        this.cacheManager = cacheManager;
     }
 
     @Override
+    @Cacheable(value = "queryLogs", key = "#userId")
     public List<QueryLog> getQueryLogsByUser(Long userId) {
         User user = userService.findById(userId);
         if(user == null) {
@@ -52,8 +58,9 @@ public class QueryLogServiceImpl extends BaseCrudServiceImpl<QueryLog, Long, Que
     //TODO: refactor this method to use Spring AOP
     @Override
     public void logWeatherQuery(String userName, Location location, Object response, Long duration, QueryStatus queryStatus){
+        User user = userService.findByName(userName);
         QueryLog queryLog = new QueryLog();
-        queryLog.setUser(userService.findByName(userName));
+        queryLog.setUser(user);
         queryLog.setQueryTime(new Date());
         queryLog.setLocation(location);
         queryLog.setIp(getClientIp());
@@ -67,6 +74,9 @@ public class QueryLogServiceImpl extends BaseCrudServiceImpl<QueryLog, Long, Que
         }
 
         this.repository.save(queryLog);
+
+        // evict cache for username
+        this.cacheManager.getCache("queryLogs").evict(user.getId());
     }
 
     private String getClientIp() {

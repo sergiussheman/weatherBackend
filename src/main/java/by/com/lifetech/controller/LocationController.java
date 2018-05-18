@@ -38,7 +38,7 @@ public class LocationController {
     public ResponseDTO getAllLocations() {
         LOGGER.debug("LocationController.getAllLocations() method was called");
 
-        List<LocationDTOExtended> result = this.locationService.findAll().stream()
+        List<LocationDTOExtended> result = this.locationService.getAllLocations().stream()
                 .map(locationToDTOConverter::convert)
                 .collect(Collectors.toList());
         return new ResponseDTO(result);

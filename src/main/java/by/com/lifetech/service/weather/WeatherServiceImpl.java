@@ -65,7 +65,7 @@ public class WeatherServiceImpl implements WeatherService {
         }
 
         Call<ConditionDTO> conditionCall = this.weatherClient.getWeatherConditions(location.getCountry(),
-                location.getCity(), apiKey);
+                location.getCity().replaceAll(" ", "_"), apiKey);
 
         //get weather condition in synchronous way
         ConditionDTO body;
