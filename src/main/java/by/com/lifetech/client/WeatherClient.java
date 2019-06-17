@@ -8,6 +8,7 @@ import retrofit2.http.Path;
 
 public interface WeatherClient {
 
+    //returns current weather conditions
     @GET(value = "/api/{apiKey}/conditions/q/{country}/{city}.json")
     Call<ConditionDTO> getWeatherConditions(@Path("country") String countryCode, @Path("city") String cityCode,
                                             @Path("apiKey") String apiKey);
